@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Petualangan Cahaya: Nabi & Rasul Panutanku (Kelas 1 SD)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: 'Fredoka', sans-serif;
+    }
+    h1, h2, .font-title {
+      font-family: 'Baloo 2', cursive;
+    }
+    body {
+      background-image: url('assets/bg-langit-islami.png');
+      background-size: cover;
+      background-position: center bottom;
+      background-attachment: fixed;
+    }
+    /* Trik menyatukan background putih gambar aset tanpa perlu remove bg manual */
+    .asset-badge {
+      background: #ffffff;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), inset 0 -6px 0 rgba(0, 0, 0, 0.08);
+      border: 5px solid #ffffff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .asset-badge img {
+      width: 92%;
+      height: 92%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .game-card:hover .asset-badge img {
+      transform: scale(1.12) rotate(3deg);
+    }
+    /* Efek Tombol Arcade 3D */
+    .btn-3d-yellow {
+      background: linear-gradient(180deg, #FFE033 0%, #FFB800 100%);
+      box-shadow: 0 7px 0 #C88A00, 0 12px 20px rgba(0,0,0,0.2);
+      transition: all 0.12s ease;
+    }
+    .btn-3d-yellow:active {
+      transform: translateY(5px);
+      box-shadow: 0 2px 0 #C88A00, 0 5px 10px rgba(0,0,0,0.2);
+    }
+    .btn-3d-green {
+      background: linear-gradient(180deg, #22E58A 0%, #05B265 100%);
+      box-shadow: 0 7px 0 #048048, 0 12px 20px rgba(0,0,0,0.2);
+      transition: all 0.12s ease;
+    }
+    .btn-3d-green:active {
+      transform: translateY(5px);
+      box-shadow: 0 2px 0 #048048, 0 5px 10px rgba(0,0,0,0.2);
+    }
+    .btn-3d-pink {
+      background: linear-gradient(180deg, #FF5E97 0%, #E02868 100%);
+      box-shadow: 0 7px 0 #9E1344, 0 12px 20px rgba(0,0,0,0.2);
+      transition: all 0.12s ease;
+    }
+    .btn-3d-pink:active {
+      transform: translateY(5px);
+      box-shadow: 0 2px 0 #9E1344, 0 5px 10px rgba(0,0,0,0.2);
+    }
+    .card-3d {
+      box-shadow: 0 12px 0 rgba(0,0,0,0.18), 0 20px 30px rgba(0,0,0,0.15);
+      border: 4px solid rgba(255,255,255,0.85);
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+      animation: floatSlow 3.2s ease-in-out infinite;
+    }
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    .shake {
+      animation: shakeError 0.35s ease-in-out;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden bg-sky-300 flex flex-col justify-between p-3 md:p-5 relative">
+
+  <!-- CANVAS CONFETTI -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <!-- ==================== HEADER UTAMA ==================== -->
+  <header class="w-full max-w-7xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl px-4 py-3 shadow-xl border-4 border-white flex items-center justify-between z-20">
+    <div class="flex items-center gap-3 md:gap-4">
+      <!-- Maskot Anak Sholeh -->
+      <button onclick="speakText('Halo Anak Sholeh dan Sholehah! Ayo pilih permainanmu, atau ketuk tombol suara untuk mendengarkan!')" 
+              class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-b from-amber-300 to-amber-500 p-1 shadow-md border-2 border-white flex-shrink-0 hover:scale-105 transition">
+        <img src="assets/maskot-anak-sholeh.png" alt="Maskot Anak Sholeh" class="w-full h-full object-contain rounded-xl bg-white" onerror="this.src='https://img.icons8.com/3d-fluency/94/boy.png'" />
+      </button>
+      <div>
+        <div class="inline-flex items-center gap-1.5 bg-sky-600 text-white text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-sm mb-1">
+          <!-- SVG Speaker Kecil -->
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07l1.41 1.41a7 7 0 0 0 0-9.9l-1.41 1.42z"/></svg>
+          <span>KETUK GAMBAR UNTUK DENGAR SUARA</span>
+        </div>
+        <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 leading-tight">
+          Halo Anak Sholeh! Pilih Permainanmu Yuk!
+        </h1>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Tombol Lagu & Tepuk Nabi -->
+      <button onclick="openModalLagu()" class="btn-3d-pink text-white px-4 py-2.5 md:px-6 md:py-3 rounded-2xl flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-pink-600 shadow">
+          <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+        <div class="text-left hidden sm:block">
+          <div class="text-[10px] font-bold tracking-wider uppercase opacity-90">ICE BREAKING KELAS</div>
+          <div class="text-base md:text-lg font-extrabold leading-none">Lagu & Tepuk Nabi</div>
+        </div>
+      </button>
+
+      <!-- Tombol Kembali ke Menu (Muncul saat di dalam Game) -->
+      <button id="btnBackMenu" onclick="showScreen('menuScreen')" class="hidden bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-3 rounded-2xl shadow-lg flex items-center gap-2">
+        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>MENU</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== LAYAR MENU UTAMA ==================== -->
+  <main id="menuScreen" class="flex-1 w-full max-w-7xl mx-auto my-3 grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch z-10">
+    
+    <!-- KARTU GAME 1: TANGKAP BINTANG -->
+    <div class="game-card card-3d bg-gradient-to-b from-sky-400 to-blue-600 rounded-[2rem] p-5 flex flex-col items-center justify-between text-center relative">
+      <button onclick="speakText('Permainan Satu: Tangkap Bintang! Ayo tangkap sifat baik Nabi dan jumlah dua puluh lima Nabi!')" 
+              class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-white text-blue-600 shadow-md flex items-center justify-center hover:scale-110 transition">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+
+      <div class="asset-badge w-36 h-36 md:w-44 md:h-44 mt-2 animate-float">
+        <img src="assets/ikon-game1-bintang.png" alt="Tangkap Bintang" />
+      </div>
+
+      <div>
+        <span class="bg-blue-900/70 text-white text-xs font-extrabold px-4 py-1 rounded-full uppercase tracking-wider">PERMAINAN 1</span>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-2 drop-shadow">TANGKAP BINTANG</h2>
+        <p class="text-white/95 text-sm md:text-base font-medium mt-1">Tangkap sifat baik Nabi & jumlah 25 Nabi!</p>
+      </div>
+
+      <button onclick="startGame1()" class="btn-3d-yellow w-full py-3.5 rounded-2xl text-slate-900 font-extrabold text-lg md:text-xl flex items-center justify-center gap-2 mt-2">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <span>MAIN SEKARANG</span>
+      </button>
+    </div>
+
+    <!-- KARTU GAME 2: RODA MUKJIZAT -->
+    <div class="game-card card-3d bg-gradient-to-b from-amber-400 to-orange-500 rounded-[2rem] p-5 flex flex-col items-center justify-between text-center relative">
+      <button onclick="speakText('Permainan Dua: Roda Mukjizat! Putar rodanya dan tebak gambar mukjizat para Nabi!')" 
+              class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-white text-orange-600 shadow-md flex items-center justify-center hover:scale-110 transition">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+
+      <div class="asset-badge w-36 h-36 md:w-44 md:h-44 mt-2 animate-float" style="animation-delay: 0.4s;">
+        <img src="assets/ikon-game2-roda.png" alt="Roda Mukjizat" />
+      </div>
+
+      <div>
+        <span class="bg-amber-900/70 text-white text-xs font-extrabold px-4 py-1 rounded-full uppercase tracking-wider">PERMAINAN 2</span>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-2 drop-shadow">RODA MUKJIZAT</h2>
+        <p class="text-white/95 text-sm md:text-base font-medium mt-1">Putar roda & tebak gambar mukjizat Nabi!</p>
+      </div>
+
+      <button onclick="startGame2()" class="btn-3d-green w-full py-3.5 rounded-2xl text-white font-extrabold text-lg md:text-xl flex items-center justify-center gap-2 mt-2">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <span>MAIN SEKARANG</span>
+      </button>
+    </div>
+
+    <!-- KARTU GAME 3: DUEL 2 ANAK -->
+    <div class="game-card card-3d bg-gradient-to-b from-emerald-400 to-teal-600 rounded-[2rem] p-5 flex flex-col items-center justify-between text-center relative">
+      <button onclick="speakText('Permainan Tiga: Duel Dua Anak! Ayo maju berdua ke papan kelas, Tim Bintang melawan Tim Bulan!')" 
+              class="absolute top-4 right-4 w-12 h-12 rounded-2xl bg-white text-teal-600 shadow-md flex items-center justify-center hover:scale-110 transition">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+      </button>
+
+      <div class="asset-badge w-36 h-36 md:w-44 md:h-44 mt-2 animate-float" style="animation-delay: 0.8s;">
+        <img src="assets/ikon-game3-duel.png" alt="Duel 2 Anak" />
+      </div>
+
+      <div>
+        <span class="bg-teal-900/70 text-white text-xs font-extrabold px-4 py-1 rounded-full uppercase tracking-wider">PERMAINAN 3 (2 ANAK)</span>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-white mt-2 drop-shadow">DUEL 2 ANAK</h2>
+        <p class="text-white/95 text-sm md:text-base font-medium mt-1">Tim Bintang vs Tim Bulan di Papan Kelas!</p>
+      </div>
+
+      <button onclick="startGame3()" class="btn-3d-pink w-full py-3.5 rounded-2xl text-white font-extrabold text-lg md:text-xl flex items-center justify-center gap-2 mt-2">
+        <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <span>MAIN BERDUA</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ==================== BAR BELAJAR 4 SIFAT RASUL (BAWAH) ==================== -->
+  <footer id="footerBar" class="w-full max-w-7xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl px-4 py-2.5 shadow-xl border-4 border-white flex flex-wrap items-center justify-between gap-2 z-20">
+    <div class="text-xs md:text-sm font-extrabold text-slate-600 flex items-center gap-1.5">
+      <svg class="w-5 h-5 text-amber-500 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>KETUK UNTUK DENGAR 4 SIFAT RASUL:</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="showSifatDetail('shiddiq')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 font-extrabold text-xs md:text-sm px-3 py-1.5 rounded-xl border-2 border-sky-300 flex items-center gap-2 transition">
+        <img src="assets/sifat-shiddiq-jujur.png" class="w-6 h-6 rounded-full object-cover bg-white" />
+        <span>SHIDDIQ = JUJUR</span>
+      </button>
+      <button onclick="showSifatDetail('amanah')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-extrabold text-xs md:text-sm px-3 py-1.5 rounded-xl border-2 border-emerald-300 flex items-center gap-2 transition">
+        <img src="assets/sifat-amanah-percaya.png" class="w-6 h-6 rounded-full object-cover bg-white" />
+        <span>AMANAH = DAPAT DIPERCAYA</span>
+      </button>
+      <button onclick="speakText('Tabligh artinya menyampaikan wahyu Allah kepada umat manusia.')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-extrabold text-xs md:text-sm px-3 py-1.5 rounded-xl border-2 border-amber-300 flex items-center gap-2 transition">
+        <img src="assets/mukjizat-alquran.png" class="w-6 h-6 rounded-full object-cover bg-white" />
+        <span>TABLIGH = MENYAMPAIKAN</span>
+      </button>
+      <button onclick="showSifatDetail('fathanah')" class="bg-purple-100 hover:bg-purple-200 text-purple-800 font-extrabold text-xs md:text-sm px-3 py-1.5 rounded-xl border-2 border-purple-300 flex items-center gap-2 transition">
+        <img src="assets/sifat-fathanah-cerdas.png" class="w-6 h-6 rounded-full object-cover bg-white" />
+        <span>FATHANAH = CERDAS</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ==================== LAYAR GAME 1 & 2: TEBAK VISUAL & TANGKAP ==================== -->
+  <section id="quizScreen" class="hidden flex-1 w-full max-w-5xl mx-auto my-2 bg-white/95 backdrop-blur-md rounded-[2.5rem] p-5 md:p-7 shadow-2xl border-4 border-white flex-col justify-between z-10">
+    <!-- Top Info -->
+    <div class="flex items-center justify-between border-b-2 border-slate-100 pb-3">
+      <div class="flex items-center gap-3">
+        <span id="quizModeBadge" class="bg-amber-500 text-white font-extrabold px-4 py-1.5 rounded-full text-sm">RODA MUKJIZAT</span>
+        <span id="quizProgress" class="text-slate-500 font-bold text-sm">Soal 1 / 8</span>
+      </div>
+      <div class="bg-amber-100 border-2 border-amber-300 text-amber-800 font-extrabold px-5 py-1.5 rounded-full text-lg">
+        ⭐ Skor: <span id="quizScore">0</span>
+      </div>
+    </div>
+
+    <!-- Area Pertanyaan Bergambar Besar -->
+    <div class="flex flex-col md:flex-row items-center justify-center gap-6 my-auto py-2">
+      <div class="w-40 h-40 md:w-52 md:h-52 rounded-3xl bg-sky-50 border-4 border-sky-200 shadow-inner flex items-center justify-center p-3 flex-shrink-0">
+        <img id="questionImage" src="assets/mukjizat-kapal-nuh.png" alt="Gambar Soal" class="w-full h-full object-contain mix-blend-multiply" />
+      </div>
+      <div class="text-center md:text-left max-w-xl">
+        <button onclick="repeatCurrentQuestionVoice()" class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold px-4 py-2 rounded-full shadow mb-3 transition">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+          <span>Dengarkan Soal Lagi</span>
+        </button>
+        <h2 id="questionText" class="text-2xl md:text-4xl font-extrabold text-slate-800 leading-snug">
+          Siapakah Nabi yang membuat kapal besar?
+        </h2>
+      </div>
+    </div>
+
+    <!-- Pilihan Jawaban Bergambar Besar -->
+    <div id="answerGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+  </section>
+
+  <!-- ==================== LAYAR GAME 3: DUEL 2 ANAK (SPLIT SCREEN) ==================== -->
+  <section id="duelScreen" class="hidden flex-1 w-full max-w-7xl mx-auto my-2 grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch z-10">
+    <!-- TIM KIRI: BINTANG -->
+    <div class="bg-sky-500/95 rounded-[2rem] p-5 border-4 border-white shadow-2xl flex flex-col justify-between text-center text-white">
+      <div>
+        <span class="bg-sky-900/60 px-4 py-1 rounded-full text-xs font-bold uppercase">PEMAIN KIRI</span>
+        <h3 class="text-2xl font-extrabold mt-1">⭐ TIM BINTANG</h3>
+        <div class="text-4xl font-extrabold text-amber-300 mt-1" id="scoreLeft">0</div>
+      </div>
+      <div id="leftButtons" class="grid grid-cols-1 gap-3 my-auto"></div>
+    </div>
+
+    <!-- TENGAH: SOAL &GAMBAR BERSAMA -->
+    <div class="bg-white/95 rounded-[2rem] p-5 border-4 border-amber-300 shadow-2xl flex flex-col items-center justify-between text-center">
+      <div class="text-xs font-extrabold uppercase tracking-wider bg-amber-100 text-amber-800 px-4 py-1 rounded-full">
+        ADU CEPAT TEPAT!
+      </div>
+      <div class="w-36 h-36 md:w-44 md:h-44 rounded-3xl bg-slate-50 border-4 border-slate-200 p-2 flex items-center justify-center my-2">
+        <img id="duelImage" src="assets/sifat-shiddiq-jujur.png" class="w-full h-full object-contain mix-blend-multiply" />
+      </div>
+      <h2 id="duelQuestionText" class="text-xl md:text-2xl font-extrabold text-slate-800 leading-snug">
+        Berkata jujur adalah contoh sifat...
+      </h2>
+      <button onclick="speakText(document.getElementById('duelQuestionText').innerText)" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold px-5 py-2 rounded-full shadow flex items-center gap-2">
+        <span>🔊 Baca Soal</span>
+      </button>
+    </div>
+
+    <!-- TIM KANAN: BULAN -->
+    <div class="bg-emerald-500/95 rounded-[2rem] p-5 border-4 border-white shadow-2xl flex flex-col justify-between text-center text-white">
+      <div>
+        <span class="bg-emerald-900/60 px-4 py-1 rounded-full text-xs font-bold uppercase">PEMAIN KANAN</span>
+        <h3 class="text-2xl font-extrabold mt-1">🌙 TIM BULAN</h3>
+        <div class="text-4xl font-extrabold text-amber-300 mt-1" id="scoreRight">0</div>
+      </div>
+      <div id="rightButtons" class="grid grid-cols-1 gap-3 my-auto"></div>
+    </div>
+  </section>
+
+  <!-- ==================== MODAL LAGU & TEPUK SERTA DETAIL SIFAT ==================== -->
+  <div id="modalOverlay" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-[2.5rem] max-w-2xl w-full p-6 md:p-8 border-4 border-amber-300 shadow-2xl text-center relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 bg-rose-500 text-white w-11 h-11 rounded-full font-extrabold text-xl shadow">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    /* ==================== AUDIO SYNTHESIZER & SUARA BAHASA INDONESIA ==================== */
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playTone(type) {
+      if (!audioCtx) audioCtx = new AudioCtx();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.1);
+        osc.frequency.setValueAtTime(783.99, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.start(now);
+        osc.stop(now + 0.45);
+      } else if (type === 'wrong') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.setValueAtTime(180, now + 0.15);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'id-ID';
+      utter.rate = 0.92;
+      utter.pitch = 1.15;
+      window.speechSynthesis.speak(utter);
+    }
+
+    /* ==================== BANK SOAL VISUAL (TERHUBUNG KE 12 GAMBAR ASET) ==================== */
+    const QUESTION_BANK = [
+      {
+        img: 'assets/mukjizat-kapal-nuh.png',
+        question: 'Siapakah Nabi yang membuat kapal besar saat banjir besar?',
+        voice: 'Siapakah Nabi yang membuat kapal besar saat banjir besar?',
+        options: [
+          { label: 'Nabi Nuh a.s.', img: 'assets/mukjizat-kapal-nuh.png', correct: true },
+          { label: 'Nabi Musa a.s.', img: 'assets/mukjizat-laut-musa.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/mukjizat-laut-musa.png',
+        question: 'Tongkatnya bisa membelah lautan. Siapakah Nabi itu?',
+        voice: 'Tongkatnya bisa membelah lautan. Siapakah Nabi itu?',
+        options: [
+          { label: 'Nabi Musa a.s.', img: 'assets/mukjizat-laut-musa.png', correct: true },
+          { label: 'Nabi Ibrahim a.s.', img: 'assets/mukjizat-api-ibrahim.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/mukjizat-api-ibrahim.png',
+        question: 'Siapakah Nabi yang tidak terbakar saat dimasukkan ke dalam api?',
+        voice: 'Siapakah Nabi yang tidak terbakar saat dimasukkan ke dalam api?',
+        options: [
+          { label: 'Nabi Ibrahim a.s.', img: 'assets/mukjizat-api-ibrahim.png', correct: true },
+          { label: 'Nabi Nuh a.s.', img: 'assets/mukjizat-kapal-nuh.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/mukjizat-alquran.png',
+        question: 'Kitab suci Al-Quran adalah mukjizat terbesar milik siapa?',
+        voice: 'Kitab suci Al-Quran adalah mukjizat terbesar milik siapa?',
+        options: [
+          { label: 'Nabi Muhammad saw.', img: 'assets/mukjizat-alquran.png', correct: true },
+          { label: 'Nabi Musa a.s.', img: 'assets/mukjizat-laut-musa.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/sifat-shiddiq-jujur.png',
+        question: 'Nabi selalu berkata JUJUR. Jujur disebut sifat apa?',
+        voice: 'Nabi selalu berkata jujur. Jujur disebut sifat apa?',
+        options: [
+          { label: 'Shiddiq (Jujur)', img: 'assets/sifat-shiddiq-jujur.png', correct: true },
+          { label: 'Fathanah (Cerdas)', img: 'assets/sifat-fathanah-cerdas.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/sifat-amanah-percaya.png',
+        question: 'Nabi selalu DAPAT DIPERCAYA. Itu adalah sifat...',
+        voice: 'Nabi selalu dapat dipercaya. Itu adalah sifat...',
+        options: [
+          { label: 'Amanah (Dipercaya)', img: 'assets/sifat-amanah-percaya.png', correct: true },
+          { label: 'Shiddiq (Jujur)', img: 'assets/sifat-shiddiq-jujur.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/sifat-fathanah-cerdas.png',
+        question: 'Nabi dan Rasul sangat CERDAS dan pintar. Cerdas artinya...',
+        voice: 'Nabi dan Rasul sangat cerdas dan pintar. Cerdas artinya...',
+        options: [
+          { label: 'Fathanah (Cerdas)', img: 'assets/sifat-fathanah-cerdas.png', correct: true },
+          { label: 'Amanah (Dipercaya)', img: 'assets/sifat-amanah-percaya.png', correct: false }
+        ]
+      },
+      {
+        img: 'assets/ikon-game1-bintang.png',
+        question: 'Berapa jumlah Nabi dan Rasul yang wajib kita imani?',
+        voice: 'Berapa jumlah Nabi dan Rasul yang wajib kita imani?',
+        options: [
+          { label: '25 Nabi & Rasul', img: 'assets/ikon-game1-bintang.png', correct: true },
+          { label: '10 Nabi Saja', img: 'assets/ikon-game2-roda.png', correct: false }
+        ]
+      }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let leftScore = 0;
+    let rightScore = 0;
+
+    function showScreen(screenId) {
+      ['menuScreen', 'quizScreen', 'duelScreen'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('hidden');
+        el.classList.remove('flex', 'grid');
+      });
+      const target = document.getElementById(screenId);
+      target.classList.remove('hidden');
+      target.classList.add(screenId === 'menuScreen' || screenId === 'duelScreen' ? 'grid' : 'flex');
+
+      document.getElementById('btnBackMenu').classList.toggle('hidden', screenId === 'menuScreen');
+      document.getElementById('footerBar').classList.toggle('hidden', screenId !== 'menuScreen');
+    }
+
+    function startGame1() {
+      currentIdx = 0;
+      score = 0;
+      document.getElementById('quizModeBadge').innerText = '🌟 TANGKAP BINTANG NABI';
+      showScreen('quizScreen');
+      loadQuizQuestion();
+    }
+
+    function startGame2() {
+      currentIdx = 0;
+      score = 0;
+      document.getElementById('quizModeBadge').innerText = '🎡 RODA MUKJIZAT NABI';
+      showScreen('quizScreen');
+      loadQuizQuestion();
+    }
+
+    function loadQuizQuestion() {
+      const q = QUESTION_BANK[currentIdx % QUESTION_BANK.length];
+      document.getElementById('quizProgress').innerText = `Soal ${currentIdx + 1} / ${QUESTION_BANK.length}`;
+      document.getElementById('quizScore').innerText = score;
+      document.getElementById('questionImage').src = q.img;
+      document.getElementById('questionText').innerText = q.question;
+      speakText(q.voice);
+
+      const grid = document.getElementById('answerGrid');
+      grid.innerHTML = '';
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'bg-gradient-to-b from-sky-50 to-sky-100 hover:from-amber-100 hover:to-amber-200 border-4 border-sky-300 rounded-3xl p-4 flex items-center gap-4 shadow-lg transition transform active:scale-95';
+        btn.innerHTML = `
+          <div class="w-20 h-20 rounded-2xl bg-white p-1.5 border-2 border-sky-200 flex-shrink-0 flex items-center justify-center">
+            <img src="${opt.img}" class="w-full h-full object-contain mix-blend-multiply" />
+          </div>
+          <div class="text-left">
+            <div class="text-xl md:text-2xl font-extrabold text-slate-800">${opt.label}</div>
+            <div class="text-xs font-bold text-sky-600 mt-1">Ketuk untuk memilih</div>
+          </div>
+        `;
+        btn.onclick = () => checkAnswer(opt.correct, btn);
+        grid.appendChild(btn);
+      });
+    }
+
+    function repeatCurrentQuestionVoice() {
+      const q = QUESTION_BANK[currentIdx % QUESTION_BANK.length];
+      speakText(q.voice);
+    }
+
+    function checkAnswer(isCorrect, btnEl) {
+      if (isCorrect) {
+        playTone('correct');
+        score += 100;
+        fireConfetti();
+        speakText('Alhamdulillah, jawabanmu benar!');
+        setTimeout(() => {
+          currentIdx++;
+          if (currentIdx < QUESTION_BANK.length) {
+            loadQuizQuestion();
+          } else {
+            speakText('Masya Allah, kamu hebat sekali! Semua soal sudah selesai!');
+            showScreen('menuScreen');
+          }
+        }, 1300);
+      } else {
+        playTone('wrong');
+        btnEl.classList.add('shake');
+        speakText('Ayo coba lagi ya anak sholeh!');
+        setTimeout(() => btnEl.classList.remove('shake'), 400);
+      }
+    }
+
+    /* ==================== MODE DUEL 2 ANAK ==================== */
+    function startGame3() {
+      currentIdx = 0;
+      leftScore = 0;
+      rightScore = 0;
+      showScreen('duelScreen');
+      loadDuelQuestion();
+    }
+
+    function loadDuelQuestion() {
+      const q = QUESTION_BANK[currentIdx % QUESTION_BANK.length];
+      document.getElementById('scoreLeft').innerText = leftScore;
+      document.getElementById('scoreRight').innerText = rightScore;
+      document.getElementById('duelImage').src = q.img;
+      document.getElementById('duelQuestionText').innerText = q.question;
+      speakText(q.voice);
+
+      ['leftButtons', 'rightButtons'].forEach((containerId, sideIdx) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        q.options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'bg-white text-slate-800 font-extrabold text-lg md:text-xl p-4 rounded-2xl shadow-lg border-4 border-white/80 flex items-center gap-3 active:scale-95 transition';
+          btn.innerHTML = `
+            <img src="${opt.img}" class="w-14 h-14 object-contain mix-blend-multiply bg-slate-50 rounded-xl p-1" />
+            <span>${opt.label}</span>
+          `;
+          btn.onclick = () => {
+            if (opt.correct) {
+              playTone('correct');
+              if (sideIdx === 0) leftScore += 100; else rightScore += 100;
+              fireConfetti();
+              speakText(sideIdx === 0 ? 'Poin untuk Tim Bintang!' : 'Poin untuk Tim Bulan!');
+              currentIdx++;
+              setTimeout(loadDuelQuestion, 1100);
+            } else {
+              playTone('wrong');
+              btn.classList.add('shake');
+              setTimeout(() => btn.classList.remove('shake'), 400);
+            }
+          };
+          container.appendChild(btn);
+        });
+      });
+    }
+
+    /* ==================== MODAL SIFAT & LAGU TEPUK ==================== */
+    function showSifatDetail(key) {
+      const data = {
+        shiddiq: {
+          title: 'SHIDDIQ = JUJUR',
+          img: 'assets/sifat-shiddiq-jujur.png',
+          desc: 'Nabi dan Rasul selalu berkata benar dan jujur, tidak pernah berbohong.'
+        },
+        amanah: {
+          title: 'AMANAH = DAPAT DIPERCAYA',
+          img: 'assets/sifat-amanah-percaya.png',
+          desc: 'Nabi dan Rasul selalu menjaga kepercayaan dan tanggung jawab dengan baik.'
+        },
+        fathanah: {
+          title: 'FATHANAH = CERDAS',
+          img: 'assets/sifat-fathanah-cerdas.png',
+          desc: 'Nabi dan Rasul memiliki akal yang cerdas dan bijaksana dalam menyelesaikan masalah.'
+        }
+      }[key];
+
+      speakText(`${data.title}. ${data.desc}`);
+      document.getElementById('modalContent').innerHTML = `
+        <div class="w-40 h-40 mx-auto rounded-3xl bg-sky-50 border-4 border-sky-200 p-3 mb-4">
+          <img src="${data.img}" class="w-full h-full object-contain mix-blend-multiply" />
+        </div>
+        <h2 class="text-3xl font-extrabold text-slate-800">${data.title}</h2>
+        <p class="text-xl text-slate-600 font-medium mt-2">${data.desc}</p>
+      `;
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function openModalLagu() {
+      const lirik = 'Tepuk Sifat Rasul! Pertama, Shiddiq artinya Jujur! Kedua, Amanah artinya Dapat Dipercaya! Ketiga, Tabligh artinya Menyampaikan! Keempat, Fathanah artinya Cerdas! Aku cinta Nabi dan Rasul!';
+      speakText(lirik);
+      document.getElementById('modalContent').innerHTML = `
+        <img src="assets/maskot-anak-sholeh.png" class="w-28 h-28 mx-auto object-contain mb-2" />
+        <h2 class="text-2xl md:text-3xl font-extrabold text-pink-600">🎵 Tepuk 4 Sifat Rasul</h2>
+        <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 mt-4 text-left space-y-2 text-lg font-bold text-slate-700">
+          <p>👏👏 <b>Shiddiq</b> = Berkata Jujur!</p>
+          <p>👏👏 <b>Amanah</b> = Dapat Dipercaya!</p>
+          <p>👏👏 <b>Tabligh</b> = Menyampaikan Wahyu!</p>
+          <p>👏👏 <b>Fathanah</b> = Anak yang Cerdas!</p>
+        </div>
+        <button onclick="speakText('${lirik}')" class="btn-3d-yellow mt-5 px-6 py-3 rounded-2xl font-extrabold text-slate-900">
+          🔊 Bacakan dengan Suara Ceria
+        </button>
+      `;
+      document.getElementById('modalOverlay').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.add('hidden');
+    }
+
+    /* ==================== CONFETTI SEDERHANA ==================== */
+    function fireConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({ length: 45 }, () => ({
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 14,
+        vy: (Math.random() - 0.8) * 14,
+        size: Math.random() * 10 + 6,
+        color: ['#FFB800', '#22E58A', '#FF5E97', '#38BDF8'][Math.floor(Math.random() * 4)]
+      }));
+      let frame = 0;
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.35;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+        if (++frame < 45) requestAnimationFrame(render);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      render();
+    }
+  </script>
+</body>
+</html>
